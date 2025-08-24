@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Grammar Practice</title>
+    <!-- Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            border: 0;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        :root {
+            --hue-primary: 223;
+            --hue-secondary: 178;
+            --primary500: hsl(var(--hue-primary), 90%, 50%);
+            --primary600: hsl(var(--hue-primary), 90%, 60%);
+            --primary700: hsl(var(--hue-primary), 90%, 70%);
+            --secondary800: hsl(var(--hue-secondary), 90%, 80%);
+            --dark-gray50: hsl(var(--hue-primary), 90%, 5%);
+            --dark-gray100: hsl(var(--hue-primary), 90%, 10%);
+            --white0: hsla(0, 0%, 100%, 0);
+            --white50: hsla(0, 0%, 100%, 0.05);
+            --white100: hsla(0, 0%, 100%, 0.1);
+            --white200: hsla(0, 0%, 100%, 0.2);
+            --white300: hsla(0, 0%, 100%, 0.3);
+            --white400: hsla(0, 0%, 100%, 0.4);
+            --white500: hsla(0, 0%, 100%, 0.5);
+            --white: hsl(0, 0%, 100%);
+            font-size: clamp(0.75rem, 0.65rem + 0.5vw, 1.25rem);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: linear-gradient(90deg, var(--dark-gray100), var(--dark-gray50)); /* A deep, dark gray background */
+            min-height: 100vh;
+            display: grid;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        /* Glassmorphism style */
+        .glass-container {
+            --blur: 12px;
+            backdrop-filter: blur(var)(var(--blur));
+            -webkit-backdrop-filter: blur(var(--blur));
+            background-image: linear-gradient(90deg,var(--primary600), var(--primary500));
+            background-color: rgba(255, 255, 255, 0.1); /* Slightly more transparent */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15); /* Lighter border */
+            box-shadow: 0 0.25em 0.375em rgba(0, 0, 0, 0.1); /* Stronger shadow */
+        }
+
+        /* Set a consistent cursor for draggable items */
+        [draggable="true"] {
+            cursor: grab;
+            user-select: none; /* Prevents text selection on drag */
+        }
+
+        /* Style for the drop zones */
+        .drop-zone {
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            color: transparent; /* Hide the text until a word is dropped */
+            min-width: 5rem;
+            min-height: 2.5rem;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+            line-height: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .drop-zone.filled {
+            border-color: transparent;
+            background-color: transparent;
+            color: #d1d5db; /* A lighter gray for the dropped word */
+        }
+        
+        .drop-zone.filled:hover {
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.1); /* Slight highlight on hover */
+        }
+
+        /* Style for a valid drop area on dragover */
+        .drop-zone.valid-target {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-color: #4f46e5;
+        }
+        
+        /* Style for the draggable words in the options container */
+        .word-option {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease-in-out;
+            transform-origin: center;
+        }
+        
+        .word-option:hover {
+            transform: scale(1.05);
+            background-color: #2563eb;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="selection:bg-blue-200">
+    <div class="max-w-xl w-full rounded-3xl p-6 md:p-10 flex flex-col items-center glass-container">
+        <!-- Main title and score display -->
+        <div class="flex flex-col items-center mb-6 w-full">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-100 mb-2 text-center drop-shadow-lg">BELAJAR BERSAMA TOKO GANGAN</h1>
+            <p class="text-2xl md:text-3xl font-bold text-gray-100 mb-2 text-center drop-shadow-lg"></p>drag and drop jawaban kedalam box</p>
+            <div id="score-display" class="mt-4 text-xl font-semibold text-gray-200 drop-shadow-md">Score: 0</div>
+        </div>
+        
+        <!-- Game Container -->
+        <div class="w-full flex flex-col items-center">
+            <!-- Indonesian Translation -->
+            <div class="bg-blue-600 text-white rounded-lg p-4 mb-4 w-full text-center text-lg md:text-xl font-medium">
+                <p id="indonesian-text"></p>
+            </div>
+
+            <!-- Drop Zone Container -->
+            <div id="drop-zone-container" class="flex flex-wrap justify-center p-4 min-h-[100px] mb-6 transition-all duration-300">
+                <!-- Drop zones will be dynamically added here -->
+            </div>
+            
+            <!-- Drag and Drop word options -->
+            <div id="word-options-container" class="flex flex-wrap justify-center gap-3 md:gap-4 mb-8 w-full">
+                <!-- Words will be dynamically added here -->
+            </div>
+
+            <!-- Feedback and Next Button -->
+            <div id="feedback-container" class="text-center text-xl font-bold mb-4 transition-all duration-300 transform scale-0 text-white"></div>
+            <button id="next-button" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 transform scale-0" disabled>Next Sentence</button>
+        </div>
+    </div>
+    
+    <script>
+        // Data for the grammar game
+        const sentences = [
+            { indonesianText: "Anjing itu berlari dengan gembira di taman.", correctWords: ["The", "dog", "ran", "happily", "in", "the", "park."], options: ["The", "dog", "ran", "happily", "park.", "in", "the"] },
+            { indonesianText: "Dia pergi ke toko kemarin.", correctWords: ["She", "went", "to", "the", "store", "yesterday."], options: ["She", "went", "store", "yesterday.", "the", "to", "go", "is"] },
+            { indonesianText: "Mereka sedang bermain sepak bola sekarang.", correctWords: ["They", "are", "playing", "soccer", "now."], options: ["They", "are", "playing", "now.", "soccer", "is"] },
+            { indonesianText: "Dia membaca buku baru setiap minggu.", correctWords: ["He", "reads", "a", "new", "book", "every", "week."], options: ["He", "reads", "a", "new", "every", "week.", "book", "read"] },
+            { indonesianText: "Saya memasak hidangan yang lezat.", correctWords: ["I", "cooked", "a", "delicious", "meal."], options: ["I", "cooked", "a", "delicious", "meal.", "cooking"] },
+            { indonesianText: "Langit sangat cerah hari ini.", correctWords: ["The", "sky", "is", "very", "bright", "today."], options: ["The", "sky", "is", "very", "bright", "today.", "blue"] },
+            { indonesianText: "Kucing itu tidur di atas tikar.", correctWords: ["The", "cat", "is", "sleeping", "on", "the", "mat."], options: ["The", "cat", "is", "sleeping", "on", "the", "mat.", "under"] },
+            { indonesianText: "Kami akan pergi ke bioskop malam ini.", correctWords: ["We", "are", "going", "to", "the", "cinema", "tonight."], options: ["We", "are", "going", "to", "the", "cinema", "tonight.", "tomorrow"] },
+            { indonesianText: "Ayahku sedang memperbaiki mobil.", correctWords: ["My", "father", "is", "fixing", "the", "car."], options: ["My", "father", "is", "fixing", "the", "car.", "mother"] },
+            { indonesianText: "Dia minum teh di pagi hari.", correctWords: ["He", "drinks", "tea", "in", "the", "morning."], options: ["He", "drinks", "tea", "in", "the", "morning.", "coffee"] },
+            { indonesianText: "Matahari terbit di timur.", correctWords: ["The", "sun", "rises", "in", "the", "east."], options: ["The", "sun", "rises", "in", "the", "east.", "west"] },
+            { indonesianText: "Anak-anak sedang bermain di luar.", correctWords: ["The", "children", "are", "playing", "outside."], options: ["The", "children", "are", "playing", "outside.", "inside"] },
+            { indonesianText: "Saya suka makan apel merah.", correctWords: ["I", "like", "to", "eat", "red", "apples."], options: ["I", "like", "to", "eat", "red", "apples.", "green"] },
+            { indonesianText: "Dia menyanyikan lagu yang indah.", correctWords: ["She", "sings", "a", "beautiful", "song."], options: ["She", "sings", "a", "beautiful", "song.", "loud"] },
+            { indonesianText: "Kami berjalan di sepanjang pantai.", correctWords: ["We", "walked", "along", "the", "beach."], options: ["We", "walked", "along", "the", "beach.", "road"] },
+            { indonesianText: "Kopi itu terlalu panas untuk diminum.", correctWords: ["The", "coffee", "is", "too", "hot", "to", "drink."], options: ["The", "coffee", "is", "too", "hot", "to", "drink.", "cold"] },
+            { indonesianText: "Burung itu terbang di atas pohon.", correctWords: ["The", "bird", "is", "flying", "over", "the", "tree."], options: ["The", "bird", "is", "flying", "over", "the", "tree.", "under"] },
+            { indonesianText: "Tolong buka jendelanya.", correctWords: ["Please", "open", "the", "window."], options: ["Please", "open", "the", "window.", "door"] },
+            { indonesianText: "Mereka sedang membaca di perpustakaan.", correctWords: ["They", "are", "reading", "in", "the", "library."], options: ["They", "are", "reading", "in", "the", "library.", "school"] },
+            { indonesianText: "Saya memiliki banyak pekerjaan yang harus dilakukan.", correctWords: ["I", "have", "a", "lot", "of", "work", "to", "do."], options: ["I", "have", "a", "lot", "of", "work", "to", "do.", "rest"] },
+            { indonesianText: "Dia adalah guru yang baik.", correctWords: ["She", "is", "a", "good", "teacher."], options: ["She", "is", "a", "good", "teacher.", "student"] },
+            { indonesianText: "Hujan turun sangat deras.", correctWords: ["It", "is", "raining", "very", "heavily."], options: ["It", "is", "raining", "very", "heavily.", "lightly"] },
+            { indonesianText: "Kami makan malam bersama keluarga.", correctWords: ["We", "are", "having", "dinner", "with", "the", "family."], options: ["We", "are", "having", "dinner", "with", "the", "family.", "lunch"] },
+            { indonesianText: "Tuliskan nama Anda di sini.", correctWords: ["Write", "your", "name", "here."], options: ["Write", "your", "name", "here.", "address"] },
+            { indonesianText: "Dia berbicara bahasa Inggris dengan lancar.", correctWords: ["He", "speaks", "English", "fluently."], options: ["He", "speaks", "English", "fluently.", "slowly"] },
+            { indonesianText: "Pintu itu terbuka.", correctWords: ["The", "door", "is", "open."], options: ["The", "door", "is", "open.", "closed"] },
+            { indonesianText: "Kami pergi berenang di danau.", correctWords: ["We", "went", "swimming", "in", "the", "lake."], options: ["We", "went", "swimming", "in", "the", "lake.", "sea"] },
+            { indonesianText: "Bunga-bunga itu berbau harum.", correctWords: ["The", "flowers", "smell", "sweet."], options: ["The", "flowers", "smell", "sweet.", "bad"] },
+            { indonesianText: "Buku ini sangat menarik.", correctWords: ["This", "book", "is", "very", "interesting."], options: ["This", "book", "is", "very", "interesting.", "boring"] },
+            { indonesianText: "Dia menulis surat kepada temannya.", correctWords: ["She", "wrote", "a", "letter", "to", "her", "friend."], options: ["She", "wrote", "a", "letter", "to", "her", "friend.", "email"] },
+            { indonesianText: "Saya sangat lelah.", correctWords: ["I", "am", "very", "tired."], options: ["I", "am", "very", "tired.", "happy"] },
+            { indonesianText: "Itu adalah ide yang bagus.", correctWords: ["That", "is", "a", "great", "idea."], options: ["That", "is", "a", "great", "idea.", "bad"] },
+            { indonesianText: "Mobilnya berwarna merah.", correctWords: ["His", "car", "is", "red."], options: ["His", "car", "is", "red.", "blue"] },
+            { indonesianText: "Kami memiliki waktu yang indah bersama.", correctWords: ["We", "had", "a", "wonderful", "time", "together."], options: ["We", "had", "a", "wonderful", "time", "together.", "bad"] },
+            { indonesianText: "Cuaca dingin di luar.", correctWords: ["It", "is", "cold", "outside."], options: ["It", "is", "cold", "outside.", "hot"] },
+            { indonesianText: "Tolong nyalakan lampu.", correctWords: ["Please", "turn", "on", "the", "light."], options: ["Please", "turn", "on", "the", "light.", "off"] },
+            { indonesianText: "Anjing itu menggonggong dengan keras.", correctWords: ["The", "dog", "is", "barking", "loudly."], options: ["The", "dog", "is", "barking", "loudly.", "quietly"] },
+            { indonesianText: "Dia makan siang di restoran.", correctWords: ["He", "is", "eating", "lunch", "at", "a", "restaurant."], options: ["He", "is", "eating", "lunch", "at", "a", "restaurant.", "dinner"] },
+            { indonesianText: "Ponsel saya ada di meja.", correctWords: ["My", "phone", "is", "on", "the", "table."], options: ["My", "phone", "is", "on", "the", "table.", "chair"] },
+            { indonesianText: "Kuda itu lari sangat cepat.", correctWords: ["The", "horse", "runs", "very", "fast."], options: ["The", "horse", "runs", "very", "fast.", "slowly"] },
+            { indonesianText: "Kami akan makan di luar malam ini.", correctWords: ["We", "will", "eat", "out", "tonight."], options: ["We", "will", "eat", "out", "tonight.", "in"] },
+            { indonesianText: "Dia memasak sup yang enak.", correctWords: ["She", "cooked", "a", "good", "soup."], options: ["She", "cooked", "a", "good", "soup.", "bad"] },
+            { indonesianText: "Baju ini terlalu kecil.", correctWords: ["This", "shirt", "is", "too", "small."], options: ["This", "shirt", "is", "too", "small.", "large"] },
+            { indonesianText: "Dia akan menelepon saya nanti.", correctWords: ["He", "will", "call", "me", "later."], options: ["He", "will", "call", "me", "later.", "now"] },
+            { indonesianText: "Mari kita bertemu di kafe.", correctWords: ["Let's", "meet", "at", "the", "cafe."], options: ["Let's", "meet", "at", "the", "cafe.", "school"] },
+            { indonesianText: "Udara terasa segar.", correctWords: ["The", "air", "feels", "fresh."], options: ["The", "air", "feels", "fresh.", "stale"] },
+            { indonesianText: "Dia sedang mendengarkan musik.", correctWords: ["He", "is", "listening", "to", "music."], options: ["He", "is", "listening", "to", "music.", "radio"] },
+            { indonesianText: "Saya kehilangan kunci saya.", correctWords: ["I", "lost", "my", "keys."], options: ["I", "lost", "my", "keys.", "wallet"] },
+            { indonesianText: "Mereka sedang duduk di bangku.", correctWords: ["They", "are", "sitting", "on", "the", "bench."], options: ["They", "are", "sitting", "on", "the", "bench.", "chair"] },
+            { indonesianText: "Dia berlari sangat cepat.", correctWords: ["He", "runs", "very", "fast."], options: ["He", "runs", "very", "fast.", "slowly"] },
+            { indonesianText: "Pekerjaan itu sulit.", correctWords: ["The", "job", "is", "difficult."], options: ["The", "job", "is", "difficult.", "easy"] },
+            { indonesianText: "Saya memiliki janji besok.", correctWords: ["I", "have", "an", "appointment", "tomorrow."], options: ["I", "have", "an", "appointment", "tomorrow.", "today"] },
+            { indonesianText: "Waktunya untuk pergi tidur.", correctWords: ["It's", "time", "to", "go", "to", "bed."], options: ["It's", "time", "to", "go", "to", "bed.", "work"] },
+            { indonesianText: "Taman itu dipenuhi bunga.", correctWords: ["The", "garden", "is", "full", "of", "flowers."], options: ["The", "garden", "is", "full", "of", "flowers.", "trees"] },
+            { indonesianText: "Dia tersenyum padaku.", correctWords: ["She", "smiled", "at", "me."], options: ["She", "smiled", "at", "me.", "him"] },
+            { indonesianText: "Saya lupa dompet saya di rumah.", correctWords: ["I", "forgot", "my", "wallet", "at", "home."], options: ["I", "forgot", "my", "wallet", "at", "home.", "phone"] },
+            { indonesianText: "Saya ingin segelas air.", correctWords: ["I", "would", "like", "a", "glass", "of", "water."], options: ["I", "would", "like", "a", "glass", "of", "water.", "juice"] },
+            { indonesianText: "Dia sedang mencari kacamata.", correctWords: ["He", "is", "looking", "for", "his", "glasses."], options: ["He", "is", "looking", "for", "his", "glasses.", "phone"] },
+            { indonesianText: "Kami pergi untuk piknik.", correctWords: ["We", "went", "for", "a", "picnic."], options: ["We", "went", "for", "a", "picnic.", "hike"] },
+            { indonesianText: "Itu adalah kejutan yang menyenangkan.", correctWords: ["It", "was", "a", "pleasant", "surprise."], options: ["It", "was", "a", "pleasant", "surprise.", "bad"] }
+        ];
+
+        let currentSentenceIndex = 0;
+        let score = 0;
+        let currentDropState = []; // Array to track the words dropped into each zone
+        let draggedElement = null; // Store the currently dragged element
+
+        const indonesianTextEl = document.getElementById('indonesian-text');
+        const dropZoneContainer = document.getElementById('drop-zone-container');
+        const wordOptionsContainer = document.getElementById('word-options-container');
+        const nextButton = document.getElementById('next-button');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const scoreDisplayEl = document.getElementById('score-display');
+        
+        let sentencesToUse = []; // New array to store the randomized sentence order
+        const WIN_SCORE = 10;
+
+        // Function to shuffle an array (Fisher-Yates algorithm)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        
+        // Initializes the game by shuffling the full list of sentences
+        function initializeGame() {
+            sentencesToUse = [...sentences]; // Copy the full list
+            shuffleArray(sentencesToUse);
+            currentSentenceIndex = 0;
+            renderSentence();
+        }
+
+        // Renders the current sentence and word options
+        function renderSentence() {
+            if (score >= WIN_SCORE) {
+                showWinMessage();
+                return;
+            }
+
+            const currentSentence = sentencesToUse[currentSentenceIndex];
+            
+            // Reset the state for the new sentence
+            currentDropState = new Array(currentSentence.correctWords.length).fill(null);
+            
+            // Set the Indonesian translation
+            indonesianTextEl.textContent = currentSentence.indonesianText;
+
+            // Clear previous drop zones
+            dropZoneContainer.innerHTML = '';
+            
+            // Create a drop zone for each word in the correct sentence
+            currentSentence.correctWords.forEach((word, index) => {
+                const dropZoneEl = document.createElement('div');
+                dropZoneEl.classList.add('drop-zone');
+                dropZoneEl.dataset.index = index;
+                dropZoneEl.dataset.correctWord = word;
+                dropZoneContainer.appendChild(dropZoneEl);
+            });
+            
+            // Clear previous word options
+            wordOptionsContainer.innerHTML = '';
+            
+            // Shuffle the options to make it more challenging
+            shuffleArray(currentSentence.options);
+            
+            // Create and append draggable word elements
+            currentSentence.options.forEach(word => {
+                const wordEl = document.createElement('div');
+                wordEl.classList.add('word-option');
+                wordEl.textContent = word;
+                wordEl.setAttribute('draggable', true);
+                wordEl.dataset.word = word; // Store the word in a data attribute
+                wordOptionsContainer.appendChild(wordEl);
+            });
+
+            // Set up event listeners for drag and drop
+            setupEventListeners();
+            
+            // Reset feedback and button state
+            hideFeedback();
+            nextButton.disabled = true;
+            nextButton.classList.remove('scale-100');
+            nextButton.classList.add('scale-0');
+        }
+
+        // Sets up event listeners for both mouse and touch
+        function setupEventListeners() {
+            const dropZoneElements = document.querySelectorAll('.drop-zone');
+            dropZoneElements.forEach(el => {
+                el.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    el.classList.add('valid-target');
+                });
+                el.addEventListener('dragleave', () => {
+                    el.classList.remove('valid-target');
+                });
+                el.addEventListener('drop', handleDrop);
+                // Allow a word to be returned on click
+                el.addEventListener('click', handleReturnWord);
+            });
+
+            const wordElements = document.querySelectorAll('#word-options-container .word-option');
+            wordElements.forEach(el => {
+                el.addEventListener('dragstart', handleDragStart);
+            });
+        }
+        
+        // Handles the start of a mouse drag event
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.dataTransfer.setData('text/plain', e.target.dataset.word);
+            e.dataTransfer.dropEffect = 'move';
+            e.target.classList.add('opacity-50');
+        }
+
+        // Handles the drop event on a drop zone
+        function handleDrop(e) {
+            e.preventDefault();
+            const droppedWord = e.dataTransfer.getData('text/plain');
+            const targetDropZone = e.target.closest('.drop-zone');
+
+            // Remove dragover visual feedback
+            document.querySelectorAll('.drop-zone').forEach(el => el.classList.remove('valid-target'));
+
+            // Check if drop zone is empty and drop is valid
+            if (targetDropZone && !targetDropZone.textContent) {
+                const dropIndex = parseInt(targetDropZone.dataset.index, 10);
+                
+                if (droppedWord === targetDropZone.dataset.correctWord) {
+                    // Correct word dropped
+                    targetDropZone.textContent = droppedWord;
+                    targetDropZone.classList.add('filled');
+                    if (draggedElement) {
+                       draggedElement.style.display = 'none'; // Hide the original word element
+                    }
+                    
+                    // Update the state array
+                    currentDropState[dropIndex] = droppedWord;
+                    
+                    // Check if the whole sentence is correct
+                    checkIfCorrect();
+                } else {
+                    // Incorrect word dropped, no word is placed. The original word remains in the options list.
+                    showFeedback('Wrong word. Try again!', 'text-red-400', false);
+                    setTimeout(hideFeedback, 1500);
+                }
+            } else {
+                showFeedback('Invalid drop location.', 'text-red-400', false);
+                setTimeout(hideFeedback, 1500);
+            }
+
+            // Clean up the dragged element's opacity
+            if (draggedElement) {
+                draggedElement.classList.remove('opacity-50');
+                draggedElement = null;
+            }
+        }
+        
+        // New function to handle returning a word to the options list on click
+        function handleReturnWord(e) {
+            const dropZone = e.target.closest('.drop-zone');
+            if (dropZone && dropZone.textContent) {
+                const word = dropZone.textContent;
+                const originalWordEl = document.querySelector(`#word-options-container .word-option[data-word="${word}"]`);
+                
+                if (originalWordEl) {
+                    originalWordEl.style.display = 'block'; // Make the original word visible again
+                }
+                
+                // Clear the drop zone
+                dropZone.textContent = '';
+                dropZone.classList.remove('filled');
+                
+                // Update the state array to reflect the change
+                const index = parseInt(dropZone.dataset.index, 10);
+                currentDropState[index] = null;
+            }
+        }
+        
+        // Checks if the completed sentence is correct
+        function checkIfCorrect() {
+            // Check if all drop zones are filled
+            const isCompleted = currentDropState.every(word => word !== null);
+            if (isCompleted) {
+                // Check if the order of words is correct
+                const currentSentence = sentencesToUse[currentSentenceIndex];
+                const isCorrect = currentDropState.join(' ') === currentSentence.correctWords.join(' ');
+                
+                if (isCorrect) {
+                    showFeedback('Correct! 🎉', 'text-green-400', true);
+                    score++;
+                    updateScore();
+                    if (score >= WIN_SCORE) {
+                        showWinMessage();
+                    } else {
+                        nextButton.disabled = false;
+                        nextButton.classList.replace('scale-0', 'scale-100');
+                    }
+                } else {
+                    showFeedback('Incorrect sentence order. Try again!', 'text-red-400', false);
+                }
+            }
+        }
+        
+        // Shows the winning message
+        function showWinMessage() {
+            feedbackContainer.textContent = "Selamat! Anda mendapatkan permen gratis di TOKO GANGAN!";
+            feedbackContainer.classList.remove('text-green-400', 'text-red-400', 'scale-0');
+            feedbackContainer.classList.add('text-yellow-300', 'scale-100');
+            nextButton.style.display = 'none'; // Hide the next button
+        }
+
+        // Shows a feedback message to the user
+        function showFeedback(message, colorClass, isCorrect) {
+            if (score >= WIN_SCORE) return; // Don't show feedback if the game is won
+            feedbackContainer.textContent = message;
+            feedbackContainer.classList.remove('text-green-400', 'text-red-400', 'scale-0');
+            feedbackContainer.classList.add(colorClass, 'scale-100');
+        }
+
+        // Hides the feedback message
+        function hideFeedback() {
+            feedbackContainer.classList.remove('scale-100');
+            feedbackContainer.classList.add('scale-0');
+        }
+        
+        // Updates the score display
+        function updateScore() {
+            scoreDisplayEl.textContent = `Score: ${score}`;
+        }
+
+        // Handles the "Next Sentence" button click
+        nextButton.addEventListener('click', () => {
+            currentSentenceIndex = (currentSentenceIndex + 1) % sentencesToUse.length;
+            renderSentence();
+        });
+
+        // --- Touch Event Logic for Mobile Devices ---
+        let touchStartEl = null;
+
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.closest('#word-options-container .word-option')) {
+                const wordEl = e.target.closest('#word-options-container .word-option');
+                touchStartEl = wordEl;
+                wordEl.classList.add('opacity-50');
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', (e) => {
+            if (touchStartEl) {
+                const touch = e.changedTouches[0];
+                const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+                
+                if (targetElement) {
+                    const targetDropZone = targetElement.closest('.drop-zone');
+                    if (targetDropZone && !targetDropZone.textContent) {
+                         const droppedWord = touchStartEl.dataset.word;
+                         const dropIndex = parseInt(targetDropZone.dataset.index, 10);
+                         
+                         if (droppedWord === targetDropZone.dataset.correctWord) {
+                            targetDropZone.textContent = droppedWord;
+                            targetDropZone.classList.add('filled');
+                            touchStartEl.style.display = 'none'; // Hide the original word
+                            currentDropState[dropIndex] = droppedWord;
+                            checkIfCorrect();
+                         } else {
+                            // Incorrect drop, just show feedback. The word remains visible.
+                            showFeedback('Wrong word. Try again!', 'text-red-400', false);
+                            setTimeout(hideFeedback, 1500);
+                         }
+                    } else {
+                        // Drop outside a drop zone, just show feedback
+                        showFeedback('Invalid drop location.', 'text-red-400', false);
+                        setTimeout(hideFeedback, 1500);
+                    }
+                }
+                
+                // Clean up touch state
+                if (touchStartEl) {
+                    touchStartEl.classList.remove('opacity-50');
+                    touchStartEl = null;
+                }
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Initial render
+        initializeGame();
+    </script>
+</body>
+</html>
